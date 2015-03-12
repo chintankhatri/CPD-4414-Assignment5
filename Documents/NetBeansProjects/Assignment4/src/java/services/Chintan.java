@@ -94,10 +94,14 @@ public class Chintan {
 
     @DELETE
     @Path("{id}")
-    public int deleteOne(@PathParam("id") String id) {
-        return doUpdate("delete from product where productid=?", id);
+    public Response deleteOne(@PathParam("id") String id) {
+        int result = doUpdate("delete from product where productid=?", id);
+        if (result <= 0) {
+            return Response.status(500).build();
+        } else {
+            return Response.noContent().build();
+        }
 
-        //  return Response.ok(getResult("delete from product where productid=?", String.valueOf(id))).build();
     }
 
     private int doUpdate(String query, String... params) {
