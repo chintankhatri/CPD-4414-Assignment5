@@ -32,7 +32,7 @@ import org.json.simple.JSONObject;
  *
  */
 @Path("/products")
-public class Chintan extends HttpServlet {
+public class Chintan  {
 
     @GET
     @Produces("application/json")
