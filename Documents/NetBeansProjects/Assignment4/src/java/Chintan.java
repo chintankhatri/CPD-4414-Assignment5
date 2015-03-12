@@ -38,7 +38,7 @@ public class Chintan  {
     @Produces("application/json")
     
     public Response getAll(){
-    return Response.ok(getResult("select * from products")).build();
+    return Response.ok(getResult("select * from product")).build();
     
     }
 
