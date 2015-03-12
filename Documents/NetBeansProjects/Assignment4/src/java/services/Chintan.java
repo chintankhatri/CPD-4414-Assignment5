@@ -6,6 +6,9 @@ import java.sql.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -59,37 +62,36 @@ public class Chintan {
 
         if (result <= 0) {
             return Response.status(500).build();
+
         } else {
             return Response.ok(json).build();
         }
     }
 
-    private String getResult(String query, String... parameters) {
-        StringBuilder sb = new StringBuilder();
-        JSONObject jObj = new JSONObject();
-
-        try (Connection con = Connect.getConnection()) {
-            PreparedStatement pstmt = con.prepareStatement(query);
-            for (int i = 1; i <= parameters.length; i++) {
-                pstmt.setString(i, parameters[i - 1]);
+    private static JsonArray getResult(String query, String... parameters) {
+        JsonArray json = null;
+        try {
+            Connection con = Connect.getConnection();
+            PreparedStatement pst = con.prepareStatement(query);
+            for (int i = 0; i < parameters.length; i++) {
+                pst.setString(i + 1, parameters[i]);
             }
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet results = pst.executeQuery();
 
-            while (rs.next()) {
-
-                jObj.put("productid", rs.getInt("productid"));
-                jObj.put("name", rs.getString("name"));
-                jObj.put("description", rs.getString("description"));
-                jObj.put("quantity", rs.getInt("quantity"));
-
-                sb.append(jObj.toJSONString());
+            JsonArrayBuilder array = Json.createArrayBuilder();
+            while (results.next()) {
+                array.add(Json.createObjectBuilder()
+                        
+                        .add("name", results.getString("name"))
+                        .add("description",results.getString("description"))
+                        .add("quantity", results.getString("quantity"))
+                );
             }
-
+            json = array.build();
         } catch (SQLException ex) {
-            System.err.println("Error" + ex.getMessage());
+            Logger.getLogger(Connect.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return sb.toString();
+        return json;
     }
 
     @DELETE
