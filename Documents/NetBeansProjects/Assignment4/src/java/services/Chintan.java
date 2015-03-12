@@ -6,6 +6,7 @@ import java.sql.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,17 +46,22 @@ public class Chintan {
 
     }
 
-//    @POST
-//    @Consumes("application/json")
-//    @Produces("application/json")
-//    public Response add(JSONObject json) {
-//
-//        String product = json.getString("products");
-//
-//        int result = doUpdate("INSERT INTO product (product) VALUES (?)", product);
-//        return Response.ok(json).build();
-//
-//    }
+    @POST
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response add(JsonObject json) {
+        String productid = json.getString("productid");
+        String name = json.getString("name");
+        String description = json.getString("description");
+        String quantity = json.getString("quantity");
+        int result = doUpdate("INSERT INTO product (productid,name,description,quantity) VALUES (?, ?, ?, ?)", productid, name, description, quantity);
+
+        if (result <= 0) {
+            return Response.status(500).build();
+        } else {
+            return Response.ok(json).build();
+        }
+    }
 
     private String getResult(String query, String... parameters) {
         StringBuilder sb = new StringBuilder();
@@ -85,7 +91,6 @@ public class Chintan {
         return sb.toString();
     }
 
-
     private int doUpdate(String query, String... params) {
         int numChanges = 0;
         try (Connection con = Connect.getConnection()) {
@@ -94,8 +99,10 @@ public class Chintan {
                 pstmt.setString(i, params[i - 1]);
             }
             numChanges = pstmt.executeUpdate();
+
         } catch (SQLException ex) {
-            Logger.getLogger(Chintan.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Chintan.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return numChanges;
     }
