@@ -14,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -104,6 +105,17 @@ public class Chintan {
             return Response.noContent().build();
         }
 
+    }
+    @PUT
+    @Path("{id}")
+    public Response updateOne(@PathParam("id")String id,@PathParam("name")String name,@PathParam("description")String description,@PathParam("quantity")String quantity){
+    
+      int result = doUpdate("update product set name=?,description=?,quantity=? where productid=?", name,description,quantity,id);
+        if (result <= 0) {
+            return Response.status(500).build();
+        } else {
+            return Response.noContent().build();
+        }
     }
 
     private int doUpdate(String query, String... params) {
