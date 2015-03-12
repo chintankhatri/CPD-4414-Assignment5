@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -50,11 +51,11 @@ public class Chintan {
     @Consumes("application/json")
     @Produces("application/json")
     public Response add(JsonObject json) {
-        String productid = json.getString("productid");
+
         String name = json.getString("name");
         String description = json.getString("description");
         String quantity = json.getString("quantity");
-        int result = doUpdate("INSERT INTO product (productid,name,description,quantity) VALUES (?, ?, ?, ?)", productid, name, description, quantity);
+        int result = doUpdate("INSERT INTO product (name,description,quantity) VALUES ( ?, ?, ?)", name, description, quantity);
 
         if (result <= 0) {
             return Response.status(500).build();
@@ -89,6 +90,14 @@ public class Chintan {
         }
 
         return sb.toString();
+    }
+
+    @DELETE
+    @Path("{id}")
+    public int deleteOne(@PathParam("id") String id) {
+        return doUpdate("delete from product where productid=?", id);
+
+        //  return Response.ok(getResult("delete from product where productid=?", String.valueOf(id))).build();
     }
 
     private int doUpdate(String query, String... params) {
